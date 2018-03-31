@@ -6,8 +6,12 @@
 package io.jlouie.mastermind;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  *
@@ -15,126 +19,68 @@ import java.util.Random;
  */
 public class Wizard {
 
-	private static final Random RANDOM = new Random();
-	private final Sage sage;
+    private static final Random RANDOM = new Random();
 
-	private final List<Code> guessHistory;
-	private final List<Response> responseHistory;
-	private final List<List<Code>> possibleHistory;
-	private final List<Code> impossible;
-	private List<Code> possible;
+    private final List<Code> universe = new ArrayList<>();
+    private List<Code> guessed = new LinkedList<>();
+    private List<Code> impossible = new LinkedList<>();
+    private Set<Code> possible = new HashSet<>();
 
-	public Wizard(Sage sage) {
-		this.sage = sage;
-		guessHistory = new ArrayList<>();
-		responseHistory = new ArrayList<>();
-		possibleHistory = new ArrayList<>();
-		impossible = new ArrayList<>();
-		possible = sage.getCodes();
-		possibleHistory.add(possible);
-		responseHistory.add(null);
-		guessHistory.add(null);
-	}
+    public Wizard() {
+        for (int i = 0; i < Main.getCodePointRange(); i++) {
+            universe.add(new Code(i));
+        }
+    }
 
-	public List<Code> getPossible() {
-		return possible;
-	}
+    public Code getRandomCode() {
+        return universe.get(RANDOM.nextInt(universe.size()));
+    }
 
-	public void handleResponse(Code guess, Response response) {
-		guessHistory.add(guess);
-		responseHistory.add(response);
-		filter(guess, response);
-		possibleHistory.add(possible);
-	}
+    public int handleResponse(Code guess, Key response) {
+        return eliminate(guess, response, guessed, impossible, possible);
+    }
 
-	private void filter(Code guess, Response response) {
-		List<Code> newPossible = new ArrayList<>();
-		for (Code i : possible) {
-			if (response.equals(guess.response(i))) {
-				newPossible.add(i);
-			} else if (i.equals(guess)) {
-			} else {
-				impossible.add(i);
-			}
-		}
-		possible = newPossible;
-	}
+    public static int eliminate(Code guess, Key response, List<Code> guessed, List<Code> impossible, Set<Code> possible) {
+        int total = possible.size();
+        guessed.add(guess);
+        possible.remove(guess);
+        Iterator<Code> iterator = possible.iterator();
+        while (iterator.hasNext()) {
+            Code test = iterator.next();
+            if (!guess.getKey(test).equals(response)) {
+                impossible.add(test);
+                iterator.remove();
+            }
+        }
+        return (total - possible.size()) / total;
+    }
 
-	public Code minMax() {
-		if (possible.size() == 1 || possible.size() == 2) {
-			return possible.get(0);
-		}
-		int max = Integer.MIN_VALUE;
-		Code maxCode = null;
-		for (Code c : possible) {
-			int elim = 0;
-			for (Response r : sage.getResponses()) {
-				int elimPerRes = eliminatedCount(possible, c, r);
-				if (elimPerRes != possible.size()) {
-					elim += elimPerRes;
-				}
-			}
-			if (max < elim) {
-				max = elim;
-				maxCode = c;
-			}
-		}
-		for (Code c : impossible) {
-			int elim = 0;
-			for (Response r : sage.getResponses()) {
-				int elimPerRes = eliminatedCount(possible, c, r);
-				if (elimPerRes != possible.size()) {
-					elim += elimPerRes;
-				}
-			}
-			if (max < elim) {
-				max = elim;
-				maxCode = c;
-			}
-		}
-		return maxCode;
-	}
+    public List<Code> getGuessed() {
+        return new LinkedList<>(guessed);
+    }
 
-	public Code memoMiniMax() {
-		GameNodeKey key = new GameNodeKey(possible, impossible);
-		Code best = sage.getMiniMax(key);
-		if (best == null) {
-			best = minMax();
-			sage.setMiniMax(key, best);
-		}
-		return best;
-	}
+    public void setGuessed(List<Code> guessed) {
+        this.guessed = guessed;
+    }
 
-	private int eliminatedCount(List<Code> list, Code guess, Response response) {
-		int removed = 0;
-		for (Code i : list) {
-//			if (!response.equals(i.response(guess))) {
-			if (!response.equals(sage.getResponse(i, guess))) {
-				removed++;
-			}
-		}
-		return removed;
-	}
+    public List<Code> getImpossible() {
+        return new LinkedList<>(impossible);
+    }
 
-	public int getRemovedCount(int turn) {
-		if (turn == 0) {
-			return 0;
-		}
-		return possibleHistory.get(turn - 1).size() - possibleHistory.get(turn).size();
-	}
+    public void setImpossible(List<Code> impossible) {
+        this.impossible = impossible;
+    }
 
-	public int getNumPossible(int turn) {
-		return possibleHistory.get(turn).size();
-	}
+    public Set<Code> getPossible() {
+        return new HashSet<>(possible);
+    }
 
-	public Code getRandomPossible() {
-		List<Code> l = possible;
-		int i = RANDOM.nextInt(l.size());
-		return l.get(i);
-	}
+    public void setPossible(Set<Code> possible) {
+        this.possible = possible;
+    }
 
-	public List<Code> getRandomUnused() {
-		return impossible;
-	}
+    public List<Code> getUniverse() {
+        return universe;
+    }
 
 }

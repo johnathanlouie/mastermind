@@ -11,36 +11,36 @@ package io.jlouie.mastermind;
  */
 public class Statistics {
 
-	private int max = 0;
-	private int min = Integer.MAX_VALUE;
-	private int games = 0;
-	private int turns = 0;
+    private int max = 0;
+    private int min = Integer.MAX_VALUE;
+    private int games = 0;
+    private int tries = 0;
 
-	public int getMax() {
-		return max;
-	}
+    public int getMax() {
+        return max;
+    }
 
-	public int getMin() {
-		return min;
-	}
+    public int getMin() {
+        return min;
+    }
 
-	public int getGames() {
-		return games;
-	}
+    public int getGames() {
+        return games;
+    }
 
-	public int getTurns() {
-		return turns;
-	}
+    public int getTries() {
+        return tries;
+    }
 
-	public double getAvg() {
-		return (double) turns / games;
-	}
+    public double getAvgTurns() {
+        return (double) tries / games;
+    }
 
-	public void addStats(int turn) {
-		games++;
-		turns += turn;
-		min = Integer.min(min, turn);
-		max = Integer.max(max, turn);
-	}
+    public void addStats(int tries) {
+        games++;
+        this.tries += tries;
+        min = Integer.min(min, tries);
+        max = Integer.max(max, tries);
+    }
 
 }

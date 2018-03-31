@@ -1,74 +1,90 @@
 package io.jlouie.mastermind;
 
+import java.io.Console;
+
 public class Main {
 
-	public static int COLOR_NUM = 6;
-	public static int POS_NUM = 4;
-	public static int game_num = 1;
-	public static boolean viewPossible = false;
-	public static boolean player1 = false;
-	public static boolean player2 = true;
-	public static boolean guessRater = false;
+    private static GameSettings settings = new GameSettings();
+    private static Wizard wizard;
 
-	public static void main(String[] args) {
-		GraphicalUserInterface gui = GraphicalUserInterface.getInstance();
-		CommandLineInterface cli = CommandLineInterface.getInstance();
-		if (args.length == 1 && "menu".equals(args[0])) {
-			cli.menu();
-		}
-		Sage sage = new Sage(COLOR_NUM, POS_NUM);
-		Statistics stats = new Statistics();
-		while (stats.getGames() < game_num) {
-			Wizard wiz = new Wizard(sage);
-			Player1 p1 = player1 ? new HumanPlayer1(cli) : new ComputerPlayer1();
-			Player2 p2 = player2 ? new HumanPlayer2(cli) : new ComputerPlayer2(new DonaldKnuth(wiz));
-			cli.directions();
-			Code guess;
-			Response response = null;
-			int turn = 0;
-			gui.clear();
-			while (!win(response)) {
-				cli.turn(++turn);
-				if (viewPossible) {
-					gui.unhidePossible();
-					gui.write(wiz.getPossible());
-				}
-				guess = p2.guess();
+    public static int getCodeLength() {
+        return settings.getCodeLength();
+    }
+
+    public static int getCodeRadix() {
+        return settings.getCodeLength();
+    }
+
+    public static int getCodePointRange() {
+        return settings.getCodePointRange();
+    }
+
+    public static Wizard getWizard() {
+        return wizard;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("========Settings========");
+        int numGames = Integer.parseInt(System.console().readLine("Number of games: "));
+        settings.setCodeRadix(Integer.parseInt(System.console().readLine("Number of colors: ")));
+        settings.setCodeLength(Integer.parseInt(System.console().readLine("Number of positions: ")));
+        boolean isHumanCodeMaker = Boolean.parseBoolean(System.console().readLine("Human code maker (true/false): "));
+        boolean isHumanCodeBreaker = Boolean.parseBoolean(System.console().readLine("Human code breaker (true/false): "));
+        boolean isHintsOn = Boolean.parseBoolean(System.console().readLine("Turn hints on (true/false): "));
+        boolean isGuessRaterOn = Boolean.parseBoolean(System.console().readLine("Turn on guess rater (true/false): "));
+
+        Statistics stats = new Statistics();
+        do {
+            wizard = new Wizard();
+            CodeMaker p1 = player1 ? new HumanCodeMaker(cli) : new ComputerCodeMaker();
+            CodeBreaker p2 = player2 ? new HumanCodeBreaker(cli) : new ComputerPlayer2(new DonaldKnuth(wiz));
+            cli.directions();
+            Code guess;
+            Key response = null;
+            int turn = 0;
+            gui.clear();
+            while (!win(response)) {
+                cli.turn(++turn);
+                if (viewPossible) {
+                    gui.unhidePossible();
+                    gui.write(wiz.getPossible());
+                }
+                guess = p2.guess();
 //				cli.guess(guess);
-				response = p1.respond(guess);
-//				cli.response(response);
-				gui.appendSummary(guess.toString(), response);
-				if (guessRater || !player2 || viewPossible) {
-					wiz.handleResponse(guess, response);
-				}
-				if (guessRater) {
-					cli.guessRater(wiz.getRemovedCount(turn), wiz.getNumPossible(turn - 1), wiz.getNumPossible(turn));
-				}
-			}
-			cli.answer(p1.getAnswer());
-			cli.win();
-			stats.addStats(turn);
-			cli.stats(stats.getMax(), stats.getMin(), stats.getAvg());
-			if (stats.getGames() == game_num) {
-				cli.tryAgain();
-			}
-		}
-		System.exit(0);
-	}
+                response = p1.verify(guess);
+//				cli.getKey(getKey);
+                gui.appendSummary(guess.toString(), response);
+                if (guessRater || !player2 || viewPossible) {
+                    wiz.handleResponse(guess, response);
+                }
+                if (guessRater) {
+                    cli.guessRater(wiz.getRemovedCount(turn), wiz.getNumPossible(turn - 1), wiz.getNumPossible(turn));
+                }
+            }
+            cli.answer(p1.answer());
+            cli.win();
+            stats.addStats(turn);
+            cli.stats(stats.getMax(), stats.getMin(), stats.getAvg());
+            if (stats.getGames() == game_num) {
+                cli.tryAgain();
+            }
+        } while ();
+        System.exit(0);
+    }
 
-	private static boolean win(Response response) {
-		if (response == null) {
-			return false;
-		}
-//		if (response.length() == POS_NUM) {
-//			for (int i = 0; i < response.length(); i++) {
-//				if (response.charAt(i) != 'B') {
+    private static boolean win(Key response) {
+        if (response == null) {
+            return false;
+        }
+//		if (getKey.length() == codeLength) {
+//			for (int i = 0; i < getKey.length(); i++) {
+//				if (getKey.charAt(i) != 'B') {
 //					return false;
 //				}
 //			}
 //			return true;
 //		}
-		return response.win();
-	}
+        return response.isCorrect();
+    }
 
 }

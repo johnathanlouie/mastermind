@@ -4,96 +4,106 @@ import java.util.Arrays;
 
 public class Code {
 
-	private final int[] e;
-	private final int hash;
-	private int color;
-	private int position;
+    private final int[] pegs;
+    private final int codePoint;
 
-	public Code(int x, int color, int digit) {
-		this.hash = x;
-		this.e = toBaseX(x);
-	}
+    public Code(int codePoint) {
+        if (codePoint >= Main.getCodePointRange() || codePoint < 0) {
+            throw new RuntimeException();
+        }
+        this.codePoint = codePoint;
+        this.pegs = toPegs(codePoint);
+    }
 
-	public Code(int[] p) {
-		this.e = p;
-		this.hash = toBase10(p);
-	}
+    public Code(int[] pegs) {
+        if (pegs.length != Main.getCodeLength()) {
+            throw new RuntimeException();
+        }
+        for (int i : pegs) {
+            if (i < 0 || i >= Main.getCodeRadix()) {
+                throw new RuntimeException();
+            }
+        }
+        this.pegs = pegs;
+        this.codePoint = toCodePoint(pegs);
+    }
 
-	private int toBase10(int[] p) {
-		int q = 0;
-		for (int i = 0; i < p.length; i++) {
-			if (p[i] != 0) {
-				q += p[i] * Math.pow(10, i);
-			}
-		}
-		return q;
-	}
+    public Code(char[] pegs) {
+        this.pegs = new int[pegs.length];
+        for (int i = 0; i < pegs.length; i++) {
+            this.pegs[i] = Integer.parseInt(Character.toString(pegs[i]));
+        }
+        this.codePoint = toCodePoint(this.pegs);
+    }
 
-	private int[] toBaseX(int x) {
-		int[] output = new int[position];
-		for (int i = 0; i < position; i++) {
-			int digit = x % color;
-			x /= color;
-			output[i] = digit;
-		}
-		return output;
-	}
+    private int toCodePoint(int[] pegs) {
+        int q = 0;
+        for (int i = 0; i < pegs.length; i++) {
+            if (pegs[i] != 0) {
+                q += pegs[i] * Math.pow(10, i);
+            }
+        }
+        return q;
+    }
 
-	public Response response(Code other) {
-		int[] a = Arrays.copyOf(e, e.length);
-		int[] b = Arrays.copyOf(other.e, other.e.length);
-		int[] res = new int[3];
-		StringBuilder str = new StringBuilder();
-		for (int i = 0; i < a.length; i++) {
-			if (a[i] == b[i]) {
-				str.append('B');
-				res[0]++;
-				a[i] = -1;
-				b[i] = -2;
-			}
-		}
-		for (int i = 0; i < a.length; i++) {
-			for (int j = 0; j < b.length; j++) {
-				if (a[i] == b[j]) {
-					str.append('W');
-					res[1]++;
-					b[j] = -2;
-					break;
-				}
-			}
-		}
-		int filler = e.length - str.length();
-		for (int i = 0; i < filler; i++) {
-			str.append('X');
-			res[2]++;
-		}
-//		return str.toString();
-		return new Response(res);
-	}
+    private int[] toPegs(int codePoint) {
+        int[] output = new int[Main.getCodeLength()];
+        for (int i = 0; i < Main.getCodeLength(); i++) {
+            output[i] = codePoint % Main.getCodeRadix();
+            codePoint /= Main.getCodeRadix();
+        }
+        return output;
+    }
 
-	@Override
-	public int hashCode() {
-		return hash;
-	}
+    public Key getKey(Code other) {
+        int[] a = Arrays.copyOf(pegs, pegs.length);
+        int[] b = Arrays.copyOf(other.pegs, other.pegs.length);
+        int black = 0;
+        int white = 0;
+        int none = 0;
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] == b[i]) {
+                black++;
+                a[i] = -1;
+                b[i] = -2;
+            }
+        }
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < b.length; j++) {
+                if (a[i] == b[j]) {
+                    white++;
+                    b[j] = -2;
+                    break;
+                }
+            }
+        }
+        none = Main.getCodeLength() - black - white;
+        return new Key(black, white, none);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Code other = (Code) obj;
-		return this.hash == other.hash;
-	}
+    @Override
+    public int hashCode() {
+        return codePoint;
+    }
 
-	@Override
-	public String toString() {
-		return Arrays.toString(e);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Code other = (Code) obj;
+        return this.codePoint == other.codePoint;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(pegs);
+    }
 
 }

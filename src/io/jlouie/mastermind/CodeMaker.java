@@ -9,17 +9,11 @@ package io.jlouie.mastermind;
  *
  * @author user
  */
-public class ComputerPlayer2 extends Player2 {
+public interface CodeMaker {
 
-	private GuessStyle style;
+    void setAnswer();
 
-	public ComputerPlayer2(GuessStyle style) {
-		this.style = style;
-	}
+    Code getAnswer();
 
-	@Override
-	public Code guess() {
-		return style.guess();
-	}
-
+    Key verify(Code guess);
 }

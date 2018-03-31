@@ -9,17 +9,18 @@ package io.jlouie.mastermind;
  *
  * @author user
  */
-public class DonaldKnuth implements GuessStyle {
+public class HumanCodeBreaker implements CodeBreaker {
 
-    private final Wizard wiz;
-
-    public DonaldKnuth(Wizard wiz) {
-        this.wiz = wiz;
+    public HumanCodeBreaker() {
     }
 
     @Override
     public Code guess() {
-        return wiz.memoMiniMax();
+        String login;
+        do {
+            login = System.console().readLine("Enter your guess: ");
+        } while (login.length() != Main.getCodeLength());
+        return new Code(login.toCharArray());
     }
 
 }

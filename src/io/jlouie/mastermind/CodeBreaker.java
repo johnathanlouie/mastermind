@@ -9,9 +9,8 @@ package io.jlouie.mastermind;
  *
  * @author user
  */
-public abstract class Player1 {
+public interface CodeBreaker {
 
-	public abstract Code getAnswer();
+    Code guess();
 
-	public abstract Response respond(Code guess);
 }
