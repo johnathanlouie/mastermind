@@ -13,7 +13,7 @@ public interface CodeMaker {
 
     void setAnswer();
 
-    Code getAnswer();
+    CodeWord getAnswer();
 
-    Key verify(Code guess);
+    Key verify(CodeWord guess);
 }

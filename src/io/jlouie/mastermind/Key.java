@@ -16,22 +16,13 @@ public class Key {
     private final int none;
 
     public Key(int black, int white, int none) {
-        if (black < 0) {
-            throw new RuntimeException();
-        } else if (white < 0) {
-            throw new RuntimeException();
-        } else if (none < 0) {
-            throw new RuntimeException();
-        } else if (black + white + none != Main.getCodeLength()) {
-            throw new RuntimeException();
-        }
         this.black = black;
         this.white = white;
         this.none = none;
     }
 
     public boolean isCorrect() {
-        return black == Main.getCodeLength();
+        return white == 0 && none == 0;
     }
 
     @Override

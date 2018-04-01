@@ -15,12 +15,16 @@ public class HumanCodeBreaker implements CodeBreaker {
     }
 
     @Override
-    public Code guess() {
-        String login;
+    public void receiveKey(Key key) {
+    }
+
+    @Override
+    public CodeWord guess() {
+        String input;
         do {
-            login = System.console().readLine("Enter your guess: ");
-        } while (login.length() != Main.getCodeLength());
-        return new Code(login.toCharArray());
+            input = System2.readLine("Enter your guess: ");
+        } while (!CodeWord.isValid(input));
+        return new CodeWord(input);
     }
 
 }

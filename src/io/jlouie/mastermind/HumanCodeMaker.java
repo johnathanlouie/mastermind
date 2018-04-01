@@ -11,27 +11,27 @@ package io.jlouie.mastermind;
  */
 public class HumanCodeMaker implements CodeMaker {
 
-    private Code answer;
+    private CodeWord answer;
 
     public HumanCodeMaker() {
     }
 
     @Override
     public void setAnswer() {
-        char[] login;
+        String input;
         do {
-            login = System.console().readPassword("Enter secret code: ");
-        } while (login.length != Main.getCodeLength());
-        answer = new Code(login);
+            input = System2.readPassword("Enter secret code: ");
+        } while (!CodeWord.isValid(input));
+        answer = new CodeWord(input);
     }
 
     @Override
-    public Code getAnswer() {
+    public CodeWord getAnswer() {
         return answer;
     }
 
     @Override
-    public Key verify(Code guess) {
+    public Key verify(CodeWord guess) {
         return answer.getKey(guess);
     }
 

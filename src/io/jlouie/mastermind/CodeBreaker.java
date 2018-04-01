@@ -11,6 +11,8 @@ package io.jlouie.mastermind;
  */
 public interface CodeBreaker {
 
-    Code guess();
+    CodeWord guess();
+    
+    void receiveKey(Key key);
 
 }

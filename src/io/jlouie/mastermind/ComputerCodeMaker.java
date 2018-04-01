@@ -11,23 +11,24 @@ package io.jlouie.mastermind;
  */
 public class ComputerCodeMaker implements CodeMaker {
 
-    private Code answer;
+    private CodeWord answer;
 
     public ComputerCodeMaker() {
     }
 
     @Override
     public void setAnswer() {
-        answer = Main.getWizard().getRandomCode();
+        answer = new CodeWord();
+        System.out.println("Enter secret code: ");
     }
 
     @Override
-    public Code getAnswer() {
+    public CodeWord getAnswer() {
         return answer;
     }
 
     @Override
-    public Key verify(Code guess) {
+    public Key verify(CodeWord guess) {
         return answer.getKey(guess);
     }
 
