@@ -1,4 +1,4 @@
-# mastermind
+# Mastermind
 Mastermind is a codebreaking for game for two players. One player takes the role of a codemaker and the other, the codebreaker. The codemaker chooses a secret codeword and the codebreaker tries to decypher the codeword using the clues the codemaker leaves behind.
 
 # Default Rules
