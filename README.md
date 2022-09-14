@@ -1,6 +1,11 @@
 # Mastermind
 Mastermind is a codebreaking for game for two players. One player takes the role of a codemaker and the other, the codebreaker. The codemaker chooses a secret codeword and the codebreaker tries to decypher the codeword using the clues the codemaker leaves behind.
 
+# How to Run
+```bash
+docker run -it $(docker build . -q)
+```
+
 # Default Rules
 1. The codemaker chooses a secret codeword, a four digit PIN in which each digit can only be from 0 to 5.
 2. The codebreaker guesses the codeword.
